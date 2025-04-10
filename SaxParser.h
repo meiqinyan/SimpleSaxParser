@@ -38,49 +38,6 @@ enum SPEncoding : int {
 	SPENC_UTF_8	  = 2	/* UTF-8 */
 };
 
-enum SPECode : int {
-	SPE_OK                  =  0,
-	SPE_EMPTY               =  1,
-	SPE_INVALID_FORMAT      =  2,
-	SPE_INVALID_INSTANCE    =  3,
-	SPE_TOO_BIG_VALUE       =  4,
-	SPE_PROCESSING_NAME     =  5,
-	SPE_RESERVED_NAME       =  6,
-	SPE_MISSING_CLOSING     =  7,
-	SPE_INVALID_DECL        =  8,
-	SPE_VERSION             =  9,
-	SPE_ENCODING            = 10,
-	SPE_ELEMENT_NAME        = 11,
-	SPE_MATCH               = 12,
-	SPE_COMMENT             = 13,
-	SPE_CDATA               = 14,
-	SPE_EMPTY_REF           = 15,
-	SPE_REF_SYMBOL          = 16,
-	SPE_ATTR_NAME           = 17,
-	SPE_ATTR_DESCR          = 18,
-	SPE_ROOT_DATA           = 19,
-	SPE_UNKNOWN_ENTITY      = 20,
-	SPE_ROOT_CLOSE          = 21,
-	SPE_DTD_SUPPORT         = 22,
-	SPE_EOF                 = 23,
-	SPE_CDATA_CLOSE         = 24,
-	SPE_MISSING_SEMI        = 25,
-	SPE_MISSING_QUOTE       = 26,
-	SPE_TEXT_BEFORE_ROOT    = 27,
-	SPE_TEXT_AFTER_ROOT     = 28,
-	SPE_WHITESPASE_OPEN     = 29,
-	SPE_WHITESPASE_CLOSE    = 30,
-	SPE_WHITESPACE_PROCESS  = 31,    
-	SPE_COMMENT_CLOSE       = 32,
-	SPE_ENCODING32          = 33,
-	SPE_ENTITY_DOC_OPEN     = 34,
-	SPE_CDATA_DOC_OPEN      = 35,
-	SPE_DECLARATION_CLOSE   = 36,
-	SPE_PROCESSING_CLOSE    = 37,
-	SPE_DUBLICATE_ATTRIBUTE = 38,
-	SPE_INPUT_DATA_ERROR    = 39
-};
-
 class SaxParserException : public std::exception
 {
 public:
@@ -104,6 +61,49 @@ public:
     unsigned int m_nLine;
     unsigned int m_nColumn;
     std::string m_str;
+
+	enum : int {
+		OK                  =  0,
+		EMPTY               =  1,
+		INVALID_FORMAT      =  2,
+		INVALID_INSTANCE    =  3,
+		TOO_BIG_VALUE       =  4,
+		PROCESSING_NAME     =  5,
+		RESERVED_NAME       =  6,
+		MISSING_CLOSING     =  7,
+		INVALID_DECL        =  8,
+		VERSION             =  9,
+		ENCODING            = 10,
+		ELEMENT_NAME        = 11,
+		MATCH               = 12,
+		COMMENT             = 13,
+		CDATA               = 14,
+		EMPTY_REF           = 15,
+		REF_SYMBOL          = 16,
+		ATTR_NAME           = 17,
+		ATTR_DESCR          = 18,
+		ROOT_DATA           = 19,
+		UNKNOWN_ENTITY      = 20,
+		ROOT_CLOSE          = 21,
+		DTD_SUPPORT         = 22,
+		EOF                 = 23,
+		CDATA_CLOSE         = 24,
+		MISSING_SEMI        = 25,
+		MISSING_QUOTE       = 26,
+		TEXT_BEFORE_ROOT    = 27,
+		TEXT_AFTER_ROOT     = 28,
+		WHITESPASE_OPEN     = 29,
+		WHITESPASE_CLOSE    = 30,
+		WHITESPACE_PROCESS  = 31,    
+		COMMENT_CLOSE       = 32,
+		ENCODING32          = 33,
+		ENTITY_DOC_OPEN     = 34,
+		CDATA_DOC_OPEN      = 35,
+		DECLARATION_CLOSE   = 36,
+		PROCESSING_CLOSE    = 37,
+		DUBLICATE_ATTRIBUTE = 38,
+		INPUT_DATA_ERROR    = 39
+	};
 };
 
 class SaxParser

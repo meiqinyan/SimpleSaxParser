@@ -387,7 +387,7 @@ char SaxParser::ReadChar()
 {
     char c; m_pStream->get(c);
     if (m_pStream->bad())
-        ThrowException(SPE_INPUT_DATA_ERROR, "Can't read stream");
+        ThrowException(SaxParserException::INPUT_DATA_ERROR, "Can't read stream");
     return c;
 }
 
@@ -444,7 +444,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 					state=st_open;
 					break;
 				default:
-					ThrowException(SPE_INVALID_FORMAT, "not < in st_begin");
+					ThrowException(SaxParserException::INVALID_FORMAT, "not < in st_begin");
 					break;
 				}
 					
@@ -454,7 +454,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 		case st_open:
 			{
 				if (::IsSpace(c))
-                    ThrowException(SPE_WHITESPASE_OPEN, "space");
+                    ThrowException(SaxParserException::WHITESPASE_OPEN, "space");
 				switch(c)
 				{
 				case '?':
@@ -497,7 +497,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 					break;
 				case '[':
 					if (!bOpen)
-                        ThrowException(SPE_CDATA_DOC_OPEN, "[");
+                        ThrowException(SaxParserException::CDATA_DOC_OPEN, "[");
 					state=st_cdata;
 					EnterCDATA();
 					state=st_ready;
@@ -510,7 +510,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 						state=st_ready;
 					}
 					else
-                        ThrowException(SPE_INVALID_INSTANCE);
+                        ThrowException(SaxParserException::INVALID_INSTANCE);
 					break;
 				}
 			}
@@ -531,7 +531,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 					break;
 				case '&':
 					if (!bOpen)
-                        ThrowException(SPE_ENTITY_DOC_OPEN);
+                        ThrowException(SaxParserException::ENTITY_DOC_OPEN);
 					state=st_entity;
 					EnterEntity(&temp);
 					accum=accum+temp;
@@ -539,7 +539,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 					break;
 				default:
 					if (!bOpen)
-                        ThrowException(SPE_TEXT_BEFORE_ROOT);
+                        ThrowException(SaxParserException::TEXT_BEFORE_ROOT);
 					accum+=c;
 					state=st_text;
 					break;
@@ -566,7 +566,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 			default:
 				accum+=c;
 				if (m_nLimit!=0 && accum.size()>m_nLimit)
-                    ThrowException(SPE_TOO_BIG_VALUE,accum);
+                    ThrowException(SaxParserException::TOO_BIG_VALUE,accum);
 			}
 			break;
 			
@@ -577,7 +577,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 					continue;
 				}
 				if (c!='<')
-                    ThrowException(SPE_TEXT_AFTER_ROOT);
+                    ThrowException(SaxParserException::TEXT_AFTER_ROOT);
 				m_pHandler->OnOpenTag();
 				state=st_finish_extra;
 				break;
@@ -594,7 +594,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 					state=st_finish;
 					break;
 				default:
-                    ThrowException(SPE_TEXT_AFTER_ROOT);
+                    ThrowException(SaxParserException::TEXT_AFTER_ROOT);
 				}
 		}
 	}
@@ -602,14 +602,14 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 	switch(state)
 	{
 	case st_begin:
-        ThrowException(SPE_EMPTY);
+        ThrowException(SaxParserException::EMPTY);
 		break;
 	case st_ready:
         if (m_StackItems.size() != 0)
-            ThrowException(SPE_ROOT_CLOSE);
+            ThrowException(SaxParserException::ROOT_CLOSE);
 		break;
 	case st_text:
-        ThrowException(SPE_TEXT_AFTER_ROOT);
+        ThrowException(SaxParserException::TEXT_AFTER_ROOT);
 		break;
 	}
 
@@ -639,7 +639,7 @@ void SaxParser::EnterProcessing()
 				state=st_first_part;
 			}
 			else
-                ThrowException(SPE_PROCESSING_NAME);
+                ThrowException(SaxParserException::PROCESSING_NAME);
 			break;
 
 		case st_first_part:
@@ -654,7 +654,7 @@ void SaxParser::EnterProcessing()
 				else
 				{
                     if (bError)
-                        ThrowException(SPE_RESERVED_NAME);
+                        ThrowException(SaxParserException::RESERVED_NAME);
 					accum+=c;
 					state=st_enter;
 				}
@@ -670,7 +670,7 @@ void SaxParser::EnterProcessing()
 				if (IsCharNameValid(c))
 					accum+=c;
 				else
-                    ThrowException(SPE_PROCESSING_NAME);
+                    ThrowException(SaxParserException::PROCESSING_NAME);
 			}
 			break;
 
@@ -682,7 +682,7 @@ void SaxParser::EnterProcessing()
 				state=st_check_end;
 				break;
 			case '>':
-                ThrowException(SPE_PROCESSING_CLOSE);
+                ThrowException(SaxParserException::PROCESSING_CLOSE);
 				break;
 			default:
 				accum+=c;
@@ -692,9 +692,9 @@ void SaxParser::EnterProcessing()
 
 		case st_end:
 			if (::IsSpace(c))
-                ThrowException(SPE_WHITESPACE_PROCESS);
+                ThrowException(SaxParserException::WHITESPACE_PROCESS);
 			if (c!='>')
-                ThrowException(SPE_MISSING_CLOSING);
+                ThrowException(SaxParserException::MISSING_CLOSING);
 			m_pHandler->OnCloseTag();
 			break;
 
@@ -717,7 +717,7 @@ void SaxParser::EnterProcessing()
 	}
     catch (SaxParserException& e)
     {
-        RethrowException(e, SPE_EOF, SPE_MISSING_CLOSING);
+        RethrowException(e, SaxParserException::EOF, SaxParserException::MISSING_CLOSING);
     }
 }
 
@@ -742,9 +742,9 @@ void SaxParser::EnterDeclaration()
 				continue;
 			EnterAttribute(&version,c);
 			if (version.m_name!="version")
-				ThrowException(SPE_INVALID_DECL);
+				ThrowException(SaxParserException::INVALID_DECL);
 			if (version.m_value!="1.0")
-                ThrowException(SPE_VERSION);
+                ThrowException(SaxParserException::VERSION);
 			state=st_end_version;
 			SkipWhiteSpace();
 			break;
@@ -755,18 +755,18 @@ void SaxParser::EnterDeclaration()
 			case 'e':
 				EnterAttribute(&encoding,c);
 				if (encoding.m_name!="encoding")
-                    ThrowException(SPE_INVALID_DECL);
+                    ThrowException(SaxParserException::INVALID_DECL);
 				if (encoding.m_value!="")
-                    ThrowException(SPE_ENCODING);
+                    ThrowException(SaxParserException::ENCODING);
 				SkipWhiteSpace();
 				state=st_end_encoding;
 				break;
 			case 's':
 				EnterAttribute(&sdecl,c);
 				if (sdecl.m_name!="standalone")
-                    ThrowException(SPE_INVALID_DECL);
+                    ThrowException(SaxParserException::INVALID_DECL);
 				if (!(sdecl.m_value!="yes" || sdecl.m_value!="no"))
-                    ThrowException(SPE_INVALID_DECL);
+                    ThrowException(SaxParserException::INVALID_DECL);
 				SkipWhiteSpace();
 				state=st_end;
 				break;
@@ -774,9 +774,9 @@ void SaxParser::EnterDeclaration()
 				state=st_finish;
 				break;
 			case '>':
-                ThrowException(SPE_PROCESSING_CLOSE);
+                ThrowException(SaxParserException::PROCESSING_CLOSE);
 			default:
-                ThrowException(SPE_INVALID_DECL);
+                ThrowException(SaxParserException::INVALID_DECL);
 			}
 			break;
 
@@ -786,9 +786,9 @@ void SaxParser::EnterDeclaration()
 			case 's':
 				EnterAttribute(&sdecl,c);
 				if (sdecl.m_name!="standalone")
-                    ThrowException(SPE_INVALID_DECL);
+                    ThrowException(SaxParserException::INVALID_DECL);
 				if (!(sdecl.m_value!="yes" || sdecl.m_value!="no"))
-                    ThrowException(SPE_INVALID_DECL);
+                    ThrowException(SaxParserException::INVALID_DECL);
 				SkipWhiteSpace();
 				state=st_end;
 				break;
@@ -796,10 +796,10 @@ void SaxParser::EnterDeclaration()
 				state=st_finish;
 				break;
 			case '>':
-                ThrowException(SPE_PROCESSING_CLOSE);
+                ThrowException(SaxParserException::PROCESSING_CLOSE);
 				break;
 			default:
-                ThrowException(SPE_INVALID_DECL);
+                ThrowException(SaxParserException::INVALID_DECL);
 			}
 			break;
 
@@ -810,17 +810,17 @@ void SaxParser::EnterDeclaration()
 				state=st_finish;
 				break;
 			case '>':
-                ThrowException(SPE_PROCESSING_CLOSE);
+                ThrowException(SaxParserException::PROCESSING_CLOSE);
 			default:
-                ThrowException(SPE_INVALID_DECL);
+                ThrowException(SaxParserException::INVALID_DECL);
 			}
 			break;
 
 		case st_finish:	
 			if (::IsSpace(c))
-                ThrowException(SPE_WHITESPACE_PROCESS);
+                ThrowException(SaxParserException::WHITESPACE_PROCESS);
 			if (c!='>')
-                ThrowException(SPE_MISSING_CLOSING);
+                ThrowException(SaxParserException::MISSING_CLOSING);
 			bProcess=false;
 			break;
 		}
@@ -837,7 +837,7 @@ void SaxParser::EnterDeclaration()
 	}
 	catch (SaxParserException& e)
 	{
-        RethrowException(e, SPE_EOF, SPE_MISSING_CLOSING);
+        RethrowException(e, SaxParserException::EOF, SaxParserException::MISSING_CLOSING);
 	}
 	
 }
@@ -845,7 +845,7 @@ void SaxParser::EnterDeclaration()
 void SaxParser::EnterOpenElement(char c)
 {
 	if (!::IsFirstNameValid(c))
-        ThrowException(SPE_ELEMENT_NAME);
+        ThrowException(SaxParserException::ELEMENT_NAME);
 	std::list<std::string> listAttrNames;
 	std::string accum = c;
 	
@@ -885,7 +885,7 @@ void SaxParser::EnterOpenElement(char c)
 					break;
 				default:
 					if (!::IsCharNameValid(c))
-                        ThrowException(SPE_ELEMENT_NAME);
+                        ThrowException(SaxParserException::ELEMENT_NAME);
 					else
 						accum+=c;
 				}
@@ -906,7 +906,7 @@ void SaxParser::EnterOpenElement(char c)
 				for (auto i=listAttrNames.begin(); i!=listAttrNames.end(); i++)
 				{
 					if ((*i) == attr.m_name)
-                        ThrowException(SPE_DUBLICATE_ATTRIBUTE);
+                        ThrowException(SaxParserException::DUBLICATE_ATTRIBUTE);
 				}
 				listAttrNames.push_back(attr.m_name);
 				m_pHandler->OnAttribute(attr.m_name,attr.m_value);
@@ -933,7 +933,7 @@ void SaxParser::EnterOpenElement(char c)
                 for(auto i = listAttrNames.begin(); i != listAttrNames.end(); i++)
 				{
 					if ((*i)==attr.m_name)
-                        ThrowException(SPE_DUBLICATE_ATTRIBUTE);
+                        ThrowException(SaxParserException::DUBLICATE_ATTRIBUTE);
 				}
 				listAttrNames.push_back(attr.m_name);
 				m_pHandler->OnAttribute(attr.m_name,attr.m_value);
@@ -944,9 +944,9 @@ void SaxParser::EnterOpenElement(char c)
 
 		case st_single:
 			if (::IsSpace(c))
-                ThrowException(SPE_WHITESPASE_CLOSE);
+                ThrowException(SaxParserException::WHITESPASE_CLOSE);
 			if (c!='>')
-                ThrowException(SPE_MISSING_CLOSING);
+                ThrowException(SaxParserException::MISSING_CLOSING);
 			m_pHandler->OnCloseTag();
 			return;
 			break;
@@ -956,7 +956,7 @@ void SaxParser::EnterOpenElement(char c)
 	}
 	catch (SaxParserException& e)
 	{
-        RethrowException(e, SPE_EOF, SPE_MISSING_CLOSING);
+        RethrowException(e, SaxParserException::EOF, SaxParserException::MISSING_CLOSING);
 	}
 
 }
@@ -964,7 +964,7 @@ void SaxParser::EnterOpenElement(char c)
 void SaxParser::EnterClosingElement()
 {
     if (m_StackItems.size() == 0)
-        ThrowException(SPE_MATCH);
+        ThrowException(SaxParserException::MATCH);
 
 	typedef enum {st_begin,st_name,st_end} TEState;
 	std::string accum;
@@ -980,9 +980,9 @@ void SaxParser::EnterClosingElement()
 		{
 		case st_begin:
 			if (::IsSpace(c))
-                ThrowException(SPE_WHITESPASE_CLOSE);
+                ThrowException(SaxParserException::WHITESPASE_CLOSE);
 			if (!::IsFirstNameValid(c))
-                ThrowException(SPE_ELEMENT_NAME);
+                ThrowException(SaxParserException::ELEMENT_NAME);
 			accum+=c;
 			state=st_name;
 			break;
@@ -998,7 +998,7 @@ void SaxParser::EnterClosingElement()
 			{
 			case '>':
                 if (m_StackItems.back() != accum)
-                    ThrowException(SPE_MATCH);
+                    ThrowException(SaxParserException::MATCH);
 				m_pHandler->OnElementEnd(accum);
 				m_pHandler->OnCloseTag();
                 m_StackItems.pop_back();
@@ -1006,7 +1006,7 @@ void SaxParser::EnterClosingElement()
 				break;
 			default:
 				if (!::IsCharNameValid(c))
-                    ThrowException(SPE_ELEMENT_NAME);
+                    ThrowException(SaxParserException::ELEMENT_NAME);
 				accum+=c;
 		
 			}
@@ -1014,9 +1014,9 @@ void SaxParser::EnterClosingElement()
 
 		case st_end:
 			if (c!='>')
-                ThrowException(SPE_MISSING_CLOSING);
+                ThrowException(SaxParserException::MISSING_CLOSING);
             if (m_StackItems.back() != accum)
-                ThrowException(SPE_MATCH);
+                ThrowException(SaxParserException::MATCH);
 			m_pHandler->OnElementEnd(accum);
 			m_pHandler->OnCloseTag();
             m_StackItems.pop_back();
@@ -1028,7 +1028,7 @@ void SaxParser::EnterClosingElement()
 	}
 	catch (SaxParserException& e)
 	{
-        RethrowException(e, SPE_EOF, SPE_MISSING_CLOSING);
+        RethrowException(e, SaxParserException::EOF, SaxParserException::MISSING_CLOSING);
 	}
 	
 }
@@ -1036,7 +1036,7 @@ void SaxParser::EnterClosingElement()
 void SaxParser::EnterComment()
 {
 	if (GetChar()!='-')
-        ThrowException(SPE_COMMENT);
+        ThrowException(SaxParserException::COMMENT);
 
 	try
 	{
@@ -1072,7 +1072,7 @@ void SaxParser::EnterComment()
 
 		case st_finish:
 			if (c!='>')
-                ThrowException(SPE_MISSING_CLOSING);
+                ThrowException(SaxParserException::MISSING_CLOSING);
 			m_pHandler->OnComment(accum);
 			m_pHandler->OnCloseTag();
 			return;
@@ -1082,7 +1082,7 @@ void SaxParser::EnterComment()
 	}
 	catch (SaxParserException& e)
 	{
-        RethrowException(e, SPE_EOF, SPE_COMMENT_CLOSE);
+        RethrowException(e, SaxParserException::EOF, SaxParserException::COMMENT_CLOSE);
 	}
 }
 
@@ -1098,10 +1098,10 @@ void SaxParser::EnterCDATA()
 	}
 	catch (SaxParserException& e)
 	{
-        RethrowException(e,SPE_EOF,SPE_CDATA);
+        RethrowException(e,SaxParserException::EOF,SaxParserException::CDATA);
 	}
 	if (accum != "CDATA[")
-        ThrowException(SPE_CDATA);
+        ThrowException(SaxParserException::CDATA);
 	
 	accum.erase();
 
@@ -1151,14 +1151,14 @@ void SaxParser::EnterCDATA()
 	}
 	catch (SaxParserException& e)
 	{
-        RethrowException(e, SPE_EOF, SPE_CDATA_CLOSE);
+        RethrowException(e, SaxParserException::EOF, SaxParserException::CDATA_CLOSE);
 	}
 	
 }
 
 void SaxParser::EnterDTD(char c)
 {
-    ThrowException(SPE_DTD_SUPPORT);
+    ThrowException(SaxParserException::DTD_SUPPORT);
 }
 
 void SaxParser::EnterEntity(void* pValue)
@@ -1193,7 +1193,7 @@ void SaxParser::EnterEntity(void* pValue)
 			else
 			{
 				if (!::IsDigit(c))
-                    ThrowException(SPE_REF_SYMBOL);
+                    ThrowException(SaxParserException::REF_SYMBOL);
 				else
 				{
 					accum+=c;
@@ -1204,14 +1204,14 @@ void SaxParser::EnterEntity(void* pValue)
 
 		case st_dec:
 			if (!::IsDigit(c))
-                ThrowException(SPE_REF_SYMBOL);
+                ThrowException(SaxParserException::REF_SYMBOL);
 			else
 				accum+=c;
 			break;
 
 		case st_hex:
 			if (!::IsHexDigit(c))
-                ThrowException(SPE_REF_SYMBOL);
+                ThrowException(SaxParserException::REF_SYMBOL);
 			else
 				accum+=c;
 			break;
@@ -1266,7 +1266,7 @@ void SaxParser::EnterEntity(void* pValue)
 				}
 			}
 			if (!bFound)
-                ThrowException(SPE_UNKNOWN_ENTITY, accum);
+                ThrowException(SaxParserException::UNKNOWN_ENTITY, accum);
 		}
 	}
 
@@ -1276,7 +1276,7 @@ void SaxParser::EnterEntity(void* pValue)
 	}
 	catch (SaxParserException& e)
 	{
-        RethrowException(e, SPE_EOF, SPE_MISSING_SEMI);
+        RethrowException(e, SaxParserException::EOF, SaxParserException::MISSING_SEMI);
 	}
 	
 }
@@ -1285,7 +1285,7 @@ void SaxParser::EnterAttribute(void* pAttr, char c)
 {
 	SAttribute* pAttrData=(SAttribute*)pAttr;
 	if (!::IsFirstNameValid(c))
-        ThrowException(SPE_ATTR_NAME);
+        ThrowException(SaxParserException::ATTR_NAME);
 	pAttrData->Clear();
 	pAttrData->m_name=c;
 	typedef enum {st_name,st_end_name,st_begin_value,st_value} TEState;
@@ -1317,14 +1317,14 @@ void SaxParser::EnterAttribute(void* pAttr, char c)
 				break;
 			default:
 				if (!::IsCharNameValid(c))
-                    ThrowException(SPE_ATTR_NAME);
+                    ThrowException(SaxParserException::ATTR_NAME);
 				pAttrData->m_name+=c;
 			}
 			break;
 
 		case st_end_name:
 			if (c!='=')
-                ThrowException(SPE_ATTR_DESCR);
+                ThrowException(SaxParserException::ATTR_DESCR);
 			SkipWhiteSpace();
 			state=st_begin_value;
 			break;
@@ -1336,7 +1336,7 @@ void SaxParser::EnterAttribute(void* pAttr, char c)
 				cOpen=c;
 			}
 			else
-                ThrowException(SPE_ATTR_DESCR);
+                ThrowException(SaxParserException::ATTR_DESCR);
 			break;
 
 		case st_value:
@@ -1358,19 +1358,19 @@ void SaxParser::EnterAttribute(void* pAttr, char c)
 	catch (SaxParserException& e)
 	{
         unsigned int code = e.GetCode();
-        if (e.GetCode() == SPE_EOF)
+        if (e.GetCode() == SaxParserException::EOF)
         {
             switch (state)
             {
             case st_value:
-                code = SPE_MISSING_QUOTE;
+                code = SaxParserException::MISSING_QUOTE;
                 break;
             default:
-                code = SPE_ATTR_DESCR;
+                code = SaxParserException::ATTR_DESCR;
                 break;
             }
         }
-        RethrowException(e, SPE_EOF, code);
+        RethrowException(e, SaxParserException::EOF, code);
 	}
 }
 
@@ -1426,9 +1426,9 @@ char SaxParser::GetChar()
 	if (m_pStream->eof())
 	{
 		if (m_bEmpty)
-            ThrowException(SPE_EMPTY);
+            ThrowException(SaxParserException::EMPTY);
 		else
-            ThrowException(SPE_EOF);
+            ThrowException(SaxParserException::EOF);
 	}
 	
 	char c = ReadChar();
@@ -1460,7 +1460,7 @@ char SaxParser::GetChar()
 			for (int i=1; i<step; i++)
 			{
 				if (m_pStream->eof())
-                    ThrowException(SPE_EOF);
+                    ThrowException(SaxParserException::EOF);
 				m_buffer.Put(ReadChar());
 			}
 		}
@@ -1500,9 +1500,9 @@ void SaxParser::ReadSignature()
 	};
 	for (unsigned int i=0; i<4; i++)
 		if (memcmp(&ar16[i],m_buffer.GetData().c_str(),4)==0)
-            ThrowException(SPE_ENCODING32);
+            ThrowException(SaxParserException::ENCODING32);
 	if ((m_buffer.Get(0)==0xFE && m_buffer.Get(1)==0xFF) || (m_buffer.Get(0)==0xFF && m_buffer.Get(1)==0xFE))
-        ThrowException(SPE_ENCODING32);
+        ThrowException(SaxParserException::ENCODING32);
 		
 	if ( m_buffer.Get(0)==0xEF && m_buffer.Get(1)==0xBB && m_buffer.Get(2)==0xBF)
 	{
