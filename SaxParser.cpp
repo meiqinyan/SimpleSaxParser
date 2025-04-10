@@ -9,8 +9,6 @@
 #include <cstring>
 #include <cassert>
 
-using namespace std;
-
 const int utf8ByteTable[256] = 
 {
 	//	0	1	2	3	4	5	6	7	8	9	a	b	c	d	e	f
@@ -32,7 +30,7 @@ const int utf8ByteTable[256] =
 		4,	4,	4,	4,	4,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1	// 0xf0 0xf0 to 0xf4 4 byte, 0xf5 and higher invalid
 };
 
-void ConvertUTF32ToUTF8( unsigned long input, string& output)
+void ConvertUTF32ToUTF8( unsigned long input, std::string& output)
 {
 	const unsigned long BYTE_MASK = 0xBF;
 	const unsigned long BYTE_MARK = 0x80;
@@ -78,8 +76,8 @@ void ConvertUTF32ToUTF8( unsigned long input, string& output)
 
 struct SAttribute
 {
-	string m_name;
-	string m_value;
+	std::string m_name;
+	std::string m_value;
 
 	void Clear() {m_name.erase(); m_value.erase();}
 };
@@ -137,7 +135,7 @@ const char* SaxParserException::what() const noexcept
 
 struct SEntity
 {
-	string m_szEntity;
+	std::string m_szEntity;
 	char m_value;
 };
 
@@ -158,13 +156,13 @@ int findEntity(char c) {
     return -1;
 }
 
-string ToXML(string str) {
+std::string ToXML(std::string str) {
     int lenOut = str.length();
     for (int i=0; i<str.length(); i++) {
         int k = findEntity(str[i]);
         if (k>=0) lenOut+= g_ListEntity[k].m_szEntity.length()+1;
     }
-    string outStr;
+    std::string outStr;
     outStr.resize(lenOut);
     int i2=0;
     for (int i=0; i<str.length(); i++) {
@@ -189,34 +187,34 @@ string ToXML(string str) {
 inline bool IsLetter(char c)
 {
 	if (((unsigned char)c)<127)
-		return isalpha(c) ? true : false;
+		return std::isalpha(c) ? true : false;
 	return 
 		true;
 }
 
 inline bool IsDigit(char c)
 {
-	return isdigit((unsigned char)c) ? true : false;
+	return std::isdigit((unsigned char)c) ? true : false;
 }
 
 inline bool IsHexDigit(char c)
 {
-	return isxdigit((unsigned char)c) ? true : false;
+	return std::isxdigit((unsigned char)c) ? true : false;
 }
 
 inline bool IsPrintable(char c)
 {
-	return isprint((unsigned char)c) ? true : false;
+	return std::isprint((unsigned char)c) ? true : false;
 }
 
 inline bool IsControl(char c)
 {
-	return iscntrl((unsigned char)c) ? true : false;
+	return std::iscntrl((unsigned char)c) ? true : false;
 }
 
 inline bool IsSpace(char c)
 {
-	return (isspace((unsigned char)c) || c == '\n' || c == '\r' || c=='\t') ? true : false;
+	return (std::isspace((unsigned char)c) || c == '\n' || c == '\r' || c=='\t') ? true : false;
 }
 
 inline unsigned int GetIncreaseColumn(char c)
@@ -251,13 +249,13 @@ bool IsCharNameValid(char c)
 int strcmpi(char const *a, char const *b)
 {
     for (;; a++, b++) {
-        int d = tolower((unsigned char)*a) - tolower((unsigned char)*b);
+        int d = std::tolower((unsigned char)*a) - std::tolower((unsigned char)*b);
         if (d != 0 || !*a)
             return d;
     }
 }
 
-bool IsXML(const string& str, bool& bError)
+bool IsXML(const std::string& str, bool& bError)
 {
     bError = false;
 	if (str.size()<3) return false;
@@ -273,7 +271,7 @@ bool IsXML(const string& str, bool& bError)
 	return false;
 }
 
-void TrimRight(string& str, XSPHandler* pHandler)
+void TrimRight(std::string& str, XSPHandler* pHandler)
 {
 	unsigned int pos=(unsigned int )str.size();
 	if (pos==0) return;
@@ -363,7 +361,7 @@ char SaxParser::SPBuffer::operator[] (unsigned int i) const
 	return Get(i);
 }
 
-inline const string SaxParser::SPBuffer::GetData() const
+inline const std::string SaxParser::SPBuffer::GetData() const
 {
 	assert(m_nCount>0);
 	return m_Data;
@@ -418,8 +416,8 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 	};
 	TEState state=st_begin;
 
-	string temp;
-	string accum;
+	std::string temp;
+	std::string accum;
 	bool bOpen=false;
 	pHandler->OnDocumentBegin();
 
@@ -591,7 +589,7 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 					EnterProcessing();
 					state=st_finish;
 					break;
-				case'!':
+				case '!':
 					EnterComment();
 					state=st_finish;
 					break;
@@ -620,7 +618,8 @@ void SaxParser::Parse(std::istream* pStream, XSPHandler* pHandler, int encoding)
 
 void SaxParser::EnterProcessing()
 {
-	string accum; char store;
+	std::string accum;
+	char store;
 	enum TEState {st_begin,st_first_part,st_enter,st_check_end,st_end};
 	TEState state=st_begin;
 
@@ -827,7 +826,7 @@ void SaxParser::EnterDeclaration()
 		}
 	}
 	
-	string szEncoding; string szStandalone;
+	std::string szEncoding, szStandalone;
 	if (encoding.m_value.size()!=0) szEncoding=encoding.m_value;
 	if (sdecl.m_value.size()!=0) szStandalone=sdecl.m_value;
 	m_pHandler->OnDeclaration(version.m_value,szEncoding,szStandalone);
@@ -848,7 +847,7 @@ void SaxParser::EnterOpenElement(char c)
 	if (!::IsFirstNameValid(c))
         ThrowException(SPE_ELEMENT_NAME);
 	std::list<std::string> listAttrNames;
-	string accum; accum=c;
+	std::string accum = c;
 	
 	enum TEState {st_name=0,st_end_name,st_end_attr,st_single};
 	TEState state=st_name;
@@ -968,7 +967,7 @@ void SaxParser::EnterClosingElement()
         ThrowException(SPE_MATCH);
 
 	typedef enum {st_begin,st_name,st_end} TEState;
-	string accum;
+	std::string accum;
 	TEState state=st_begin;
 
 	try
@@ -1042,7 +1041,7 @@ void SaxParser::EnterComment()
 	try
 	{
 
-	string accum;
+	std::string accum;
 	typedef enum {st_enter,st_check_end,st_finish} TEState;
 	TEState state=st_enter;
 	
@@ -1089,7 +1088,7 @@ void SaxParser::EnterComment()
 
 void SaxParser::EnterCDATA()
 {
-	string accum;
+	std::string accum;
 
 	try
 	{
@@ -1164,9 +1163,9 @@ void SaxParser::EnterDTD(char c)
 
 void SaxParser::EnterEntity(void* pValue)
 {
-	string& retStr=*(string*)pValue;
+	std::string& retStr = *(std::string*)pValue;
 	retStr.erase();
-	string accum;
+	std::string accum;
 	typedef enum{st_enter,st_analys,st_dec,st_hex,st_text} TEState;
 	TEState state=st_enter;
 	char c;
@@ -1291,7 +1290,8 @@ void SaxParser::EnterAttribute(void* pAttr, char c)
 	pAttrData->m_name=c;
 	typedef enum {st_name,st_end_name,st_begin_value,st_value} TEState;
 	TEState state=st_name;
-	char cOpen; string temp;
+	char cOpen;
+	std::string temp;
 
 	try
 	{
