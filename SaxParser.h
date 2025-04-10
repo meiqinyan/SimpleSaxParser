@@ -31,50 +31,54 @@ public:
 };
 
 //Encoding types. Important: 16-bit encoding is not supported! (may be in the next version)
-#define SPENC_UNKNOWN	0	/* Unknown encoding (Autodetection) */
-#define SPENC_LEGACY	1	/* Some kind of 8-bit encoding*/
-#define SPENC_UTF_8		2	/* UTF-8 */
+enum SPEncoding : int {
+	SPENC_UNKNOWN = 0,	/* Unknown encoding (Autodetection) */
+	SPENC_LEGACY  = 1,	/* Some kind of 8-bit encoding*/
+	SPENC_UTF_8	  = 2	/* UTF-8 */
+};
 
-#define SPE_OK					0
-#define SPE_EMPTY				1
-#define SPE_INVALID_FORMAT		2
-#define SPE_INVALID_INSTANCE	3
-#define SPE_TOO_BIG_VALUE		4
-#define SPE_PROCESSING_NAME		5
-#define SPE_RESERVED_NAME		6
-#define SPE_MISSING_CLOSING		7
-#define SPE_INVALID_DECL		8
-#define SPE_VERSION				9
-#define SPE_ENCODING			10
-#define SPE_ELEMENT_NAME		11
-#define SPE_MATCH				12
-#define SPE_COMMENT				13
-#define SPE_CDATA				14
-#define SPE_EMPTY_REF			15
-#define SPE_REF_SYMBOL			16
-#define SPE_ATTR_NAME			17
-#define SPE_ATTR_DESCR			18
-#define SPE_ROOT_DATA			19
-#define SPE_UNKNOWN_ENTITY		20
-#define SPE_ROOT_CLOSE			21
-#define SPE_DTD_SUPPORT			22
-#define SPE_EOF					23
-#define SPE_CDATA_CLOSE			24
-#define SPE_MISSING_SEMI		25
-#define SPE_MISSING_QUOTE		26
-#define SPE_TEXT_BEFORE_ROOT	27
-#define SPE_TEXT_AFTER_ROOT		28
-#define SPE_WHITESPASE_OPEN		29
-#define SPE_WHITESPASE_CLOSE	30
-#define SPE_WHITESPACE_PROCESS	31	
-#define SPE_COMMENT_CLOSE		32
-#define SPE_ENCODING32			33
-#define SPE_ENTITY_DOC_OPEN		34
-#define SPE_CDATA_DOC_OPEN		35
-#define SPE_DECLARATION_CLOSE	36
-#define SPE_PROCESSING_CLOSE	37
-#define SPE_DUBLICATE_ATTRIBUTE	38
-#define SPE_INPUT_DATA_ERROR    39
+enum SPECode : int {
+	SPE_OK                  =  0,
+	SPE_EMPTY               =  1,
+	SPE_INVALID_FORMAT      =  2,
+	SPE_INVALID_INSTANCE    =  3,
+	SPE_TOO_BIG_VALUE       =  4,
+	SPE_PROCESSING_NAME     =  5,
+	SPE_RESERVED_NAME       =  6,
+	SPE_MISSING_CLOSING     =  7,
+	SPE_INVALID_DECL        =  8,
+	SPE_VERSION             =  9,
+	SPE_ENCODING            = 10,
+	SPE_ELEMENT_NAME        = 11,
+	SPE_MATCH               = 12,
+	SPE_COMMENT             = 13,
+	SPE_CDATA               = 14,
+	SPE_EMPTY_REF           = 15,
+	SPE_REF_SYMBOL          = 16,
+	SPE_ATTR_NAME           = 17,
+	SPE_ATTR_DESCR          = 18,
+	SPE_ROOT_DATA           = 19,
+	SPE_UNKNOWN_ENTITY      = 20,
+	SPE_ROOT_CLOSE          = 21,
+	SPE_DTD_SUPPORT         = 22,
+	SPE_EOF                 = 23,
+	SPE_CDATA_CLOSE         = 24,
+	SPE_MISSING_SEMI        = 25,
+	SPE_MISSING_QUOTE       = 26,
+	SPE_TEXT_BEFORE_ROOT    = 27,
+	SPE_TEXT_AFTER_ROOT     = 28,
+	SPE_WHITESPASE_OPEN     = 29,
+	SPE_WHITESPASE_CLOSE    = 30,
+	SPE_WHITESPACE_PROCESS  = 31,    
+	SPE_COMMENT_CLOSE       = 32,
+	SPE_ENCODING32          = 33,
+	SPE_ENTITY_DOC_OPEN     = 34,
+	SPE_CDATA_DOC_OPEN      = 35,
+	SPE_DECLARATION_CLOSE   = 36,
+	SPE_PROCESSING_CLOSE    = 37,
+	SPE_DUBLICATE_ATTRIBUTE = 38,
+	SPE_INPUT_DATA_ERROR    = 39
+};
 
 class SaxParserException : public std::exception
 {
