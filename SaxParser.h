@@ -11,8 +11,7 @@
 
 std::string ToXML(std::string str);
 
-class XSPHandler
-{
+class XSPHandler {
 public:
 	virtual void OnOpenTag() = 0;
 	virtual void OnCloseTag() = 0;
@@ -31,15 +30,14 @@ public:
 	virtual ~XSPHandler() {}
 };
 
-//Encoding types. Important: 16-bit encoding is not supported! (may be in the next version)
+// Encoding types. Important: 16-bit encoding is not supported! (may be in the next version)
 enum SPEncoding : int {
-	SPENC_UNKNOWN = 0,	/* Unknown encoding (Autodetection) */
-	SPENC_LEGACY  = 1,	/* Some kind of 8-bit encoding*/
-	SPENC_UTF_8	  = 2	/* UTF-8 */
+	SPENC_UNKNOWN = 0,	// Unknown encoding (Autodetection)
+	SPENC_LEGACY  = 1,	// Some kind of 8-bit encoding
+	SPENC_UTF_8	  = 2	// UTF-8
 };
 
-class SaxParserException : public std::exception
-{
+class SaxParserException : public std::exception {
 public:
     const char *what() const noexcept override;
 
@@ -51,10 +49,9 @@ private:
     friend class CSaxParser;
 
 public:
-    SaxParserException(unsigned int code, unsigned int line, unsigned int column, const std::string str) :
-        m_nCode(code), m_nLine(line), m_nColumn(column), m_str(str)
+    SaxParserException(unsigned int code, unsigned int line, unsigned int column, const std::string str)
+		: m_nCode(code), m_nLine(line), m_nColumn(column), m_str(str)
     {
-
     }
 
     unsigned int m_nCode;
@@ -111,9 +108,9 @@ class SaxParser
 public:
 	SaxParser();
 	
-	void SetLimitValue(unsigned int nLimit); //Set a limit for value length (tag content). 0 means the limit is not set
-	unsigned int GetLimitValue() const; //Return a limit for value length 
-    void Parse(std::istream* pStream, XSPHandler* pHandler, int encoding = SPENC_UNKNOWN); //Parse a document
+	void SetLimitValue(unsigned int nLimit); // Set a limit for value length (tag content). 0 means the limit is not set
+	unsigned int GetLimitValue() const; // Return a limit for value length 
+    void Parse(std::istream* pStream, XSPHandler* pHandler, int encoding = SPENC_UNKNOWN); // Parse a document
 	
 private:
     unsigned int m_nLine;
@@ -152,8 +149,7 @@ private:
 	void EnterEntity(void* pData);
 	void EnterAttribute(void* pAttr, char c);
 
-    class SPBuffer
-    {
+    class SPBuffer {
     public:
         SPBuffer();
         void Put(char c);
