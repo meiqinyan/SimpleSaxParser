@@ -10,4 +10,4 @@ else()
     add_definitions(-DUSE64bit=true)
 endif()
 
-add_executable(parsertest SaxParserTest.cpp SaxFormatter.cpp SaxParser.cpp)
+add_executable(parsertest test/SaxParserTest.cpp src/SaxFormatter.cpp src/SaxParser.cpp)
